@@ -10,7 +10,7 @@ token = "vRwyh3JmkRbpEskWtiyuOuSHps3cNV-CYarGcQmqrGJ14ZVrT02FnDIzF8LmvsFXWLRASGZ
 org = "alexandria"
 bucket = "Wetterstation-Bucket"
 
-client = InfluxDBClient(url="http://192.168.2.2:8086", token=token)
+client = InfluxDBClient(url="http://192.168.2.3:8086", token=token)
 
 write_api = client.write_api(write_options=ASYNCHRONOUS)
 

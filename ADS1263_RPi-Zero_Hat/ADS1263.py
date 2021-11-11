@@ -251,10 +251,10 @@ class ADS1263:
             
     
     # Set ADC1 Measuring channel
-    def ADS1263_SetChannal(self, Channal):
-        if Channal > 10:
+    def ADS1263_SetChannel(self, Channel):
+        if Channel > 10:
             return 0
-        INPMUX = (Channal << 4) | 0x0a
+        INPMUX = (Channel << 4) | 0x0a
         self.ADS1263_WriteReg(ADS1263_REG['REG_INPMUX'], INPMUX)
         if(self.ADS1263_ReadData(ADS1263_REG['REG_INPMUX'])[0] == INPMUX):
             # print("REG_INPMUX success")
@@ -263,10 +263,10 @@ class ADS1263:
             print("REG_INPMUX unsuccess")
 
     # Set ADC2 Measuring channel
-    def ADS1263_SetChannal_ADC2(self, Channal):
-        if Channal > 10:
+    def ADS1263_SetChannel_ADC2(self, Channel):
+        if Channel > 10:
             return 0
-        INPMUX = (Channal << 4) | 0x0a
+        INPMUX = (Channel << 4) | 0x0a
         self.ADS1263_WriteReg(ADS1263_REG['REG_ADC2MUX'], INPMUX)
         if(self.ADS1263_ReadData(ADS1263_REG['REG_ADC2MUX'])[0] == INPMUX):
             # print("REG_ADC2MUX success")
@@ -276,17 +276,17 @@ class ADS1263:
             
 
     # Set ADC1 Measuring differential channel
-    def ADS1263_SetDiffChannal(self, Channal):
-        if Channal == 0:
-            INPMUX = (0<<4) | 1 	#DiffChannal	AIN0-AIN1
-        elif Channal == 1:
-            INPMUX = (2<<4) | 3 	#DiffChannal	AIN2-AIN3
-        elif Channal == 2:
-            INPMUX = (4<<4) | 5 	#DiffChannal	AIN4-AIN5
-        elif Channal == 3:
-            INPMUX = (6<<4) | 7 	#DiffChannal	AIN6-AIN7
-        elif Channal == 4:
-            INPMUX = (8<<4) | 9 	#DiffChannal	AIN8-AIN9
+    def ADS1263_SetDiffChannel(self, Channel):
+        if Channel == 0:
+            INPMUX = (0<<4) | 1 	#DiffChannel	AIN0-AIN1
+        elif Channel == 1:
+            INPMUX = (2<<4) | 3 	#DiffChannel	AIN2-AIN3
+        elif Channel == 2:
+            INPMUX = (4<<4) | 5 	#DiffChannel	AIN4-AIN5
+        elif Channel == 3:
+            INPMUX = (6<<4) | 7 	#DiffChannel	AIN6-AIN7
+        elif Channel == 4:
+            INPMUX = (8<<4) | 9 	#DiffChannel	AIN8-AIN9
         self.ADS1263_WriteReg(ADS1263_REG['REG_INPMUX'], INPMUX)
         if(self.ADS1263_ReadData(ADS1263_REG['REG_INPMUX'])[0] == INPMUX):
             # print("REG_INPMUX success")
@@ -296,17 +296,17 @@ class ADS1263:
             
 
     # Set ADC2 Measuring differential channel
-    def ADS1263_SetDiffChannal_ADC2(self, Channal):
-        if Channal == 0:
-            INPMUX = (0<<4) | 1 	#DiffChannal	AIN0-AIN1
-        elif Channal == 1:
-            INPMUX = (2<<4) | 3 	#DiffChannal	AIN2-AIN3
-        elif Channal == 2:
-            INPMUX = (4<<4) | 5 	#DiffChannal	AIN4-AIN5
-        elif Channal == 3:
-            INPMUX = (6<<4) | 7 	#DiffChannal	AIN6-AIN7
-        elif Channal == 4:
-            INPMUX = (8<<4) | 9 	#DiffChannal	AIN8-AIN9
+    def ADS1263_SetDiffChannel_ADC2(self, Channel):
+        if Channel == 0:
+            INPMUX = (0<<4) | 1 	#DiffChannel	AIN0-AIN1
+        elif Channel == 1:
+            INPMUX = (2<<4) | 3 	#DiffChannel	AIN2-AIN3
+        elif Channel == 2:
+            INPMUX = (4<<4) | 5 	#DiffChannel	AIN4-AIN5
+        elif Channel == 3:
+            INPMUX = (6<<4) | 7 	#DiffChannel	AIN6-AIN7
+        elif Channel == 4:
+            INPMUX = (8<<4) | 9 	#DiffChannel	AIN8-AIN9
         self.ADS1263_WriteReg(ADS1263_REG['REG_ADC2MUX'], INPMUX)
         if(self.ADS1263_ReadData(ADS1263_REG['REG_ADC2MUX'])[0] == INPMUX):
             # print("REG_ADC2MUX success")
@@ -374,11 +374,11 @@ class ADS1263:
         
         
     # Read ADC1 specified channel data
-    def ADS1263_GetChannalValue(self, Channel):
+    def ADS1263_GetChannelValue(self, Channel):
         if(ScanMode == 0):# 0  Single-ended input  8 channel1 Differential input  4 channe 
             if(Channel>10):
                 return 0
-            self.ADS1263_SetChannal(Channel)
+            self.ADS1263_SetChannel(Channel)
             config.delay_ms(2)
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_START1'])
             config.delay_ms(2)
@@ -387,7 +387,7 @@ class ADS1263:
         else:
             if(Channel>4):
                 return 0
-            self.ADS1263_SetDiffChannal(Channel)
+            self.ADS1263_SetDiffChannel(Channel)
             config.delay_ms(2) 
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_START1'])
             config.delay_ms(2) 
@@ -397,11 +397,11 @@ class ADS1263:
 
 
     # Read ADC2 specified channel data
-    def ADS1263_GetChannalValue_ADC2(self, Channel):
+    def ADS1263_GetChannelValue_ADC2(self, Channel):
         if(ScanMode == 0):# 0  Single-ended input  8 channel1 Differential input  4 channe 
             if(Channel>10):
                 return 0
-            self.ADS1263_SetChannal_ADC2(Channel)
+            self.ADS1263_SetChannel_ADC2(Channel)
             config.delay_ms(2)
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_START2'])
             config.delay_ms(2)
@@ -409,7 +409,7 @@ class ADS1263:
         else:
             if(Channel>4):
                 return 0
-            self.ADS1263_SetDiffChannal_ADC2(Channel)
+            self.ADS1263_SetDiffChannel_ADC2(Channel)
             config.delay_ms(2) 
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_START2'])
             config.delay_ms(2) 
@@ -420,7 +420,7 @@ class ADS1263:
     def ADS1263_GetAll(self):
         ADC_Value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for i in range(0, 10, 1):
-            ADC_Value[i] = self.ADS1263_GetChannalValue(i)
+            ADC_Value[i] = self.ADS1263_GetChannelValue(i)
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_STOP1'])
             config.delay_ms(20) 
         print("--- Read ADC1 value success ---")
@@ -430,7 +430,7 @@ class ADS1263:
     def ADS1263_GetAll_ADC2(self):
         ADC_Value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for i in range(0, 10, 1):
-            ADC_Value[i] = self.ADS1263_GetChannalValue_ADC2(i)
+            ADC_Value[i] = self.ADS1263_GetChannelValue_ADC2(i)
             self.ADS1263_WriteCmd(ADS1263_CMD['CMD_STOP2'])
             config.delay_ms(20) 
         print("--- Read ADC2 value success ---")

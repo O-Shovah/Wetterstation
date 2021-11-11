@@ -10,6 +10,7 @@ REF = 5.08          # Modify according to actual voltage
                     # external AVDD and AVSS(Default), or internal 2.5V
 TEST_ADC = 1        # ADC Test part
 TEST_RTD = 0        # RTD Test part
+TEST_SINGLE_RTD = 0 # Test a single RTD on ADC2
 
 try:
     ADC = ADS1263.ADS1263()
@@ -44,6 +45,11 @@ try:
             TEMP = (RES/100.0 - 1.0) / 0.00385      #0.00385 -- pt100
             print("TEMP is %lf"%TEMP)
             print("\33[3A")
+
+        elif(TEST_SINGLE_RTD): # Test a single RTD on ADC2
+            ADC_Value = ADC.Get
+
+
 
 except IOError as e:
     print(e)

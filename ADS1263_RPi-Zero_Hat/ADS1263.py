@@ -480,7 +480,50 @@ class ADS1263:
     
         return Value
         
-    
+    def ADS1263_Single_RTD_Test(self)
+        Delay = ADS1263_DELAY['ADS1263_DELAY_8d8ms']
+        Gain = ADS1263_GAIN['ADS1263_GAIN_1']
+        Drate = ADS1263_DRATE['ADS1263_2d5SPS']
+
+        #MODE0 (CHOP OFF)
+        MODE0 = Delay
+        self.ADS1263_WriteReg(ADS1263_REG['REG_MODE0'], MODE0)
+        config.delay_ms(1)
+
+        #(IDACMUX) IDAC2 Not connected, IDAC1 AIN4
+        IDACMUX = (0x0b << 4) | 0x04
+        self.ADS1263_WriteReg(ADS1263_REG['REG_IDACMUX'], IDACMUX)
+        config.delay_ms(1)
+
+        #(IDACMAG) IDAC2 = off, IDAC1 = 500uA
+        IDACMAG = (0x00 << 4) | 0x04
+        self.ADS1263_WriteReg(ADS1263_REG['REG_IDACMAG'], IDACMAG)
+        config.delay_ms(1)
+
+        MODE2 = (Gain << 4) | Drate
+        self.ADS1263_WriteReg(ADS1263_REG['REG_MODE2'], MODE2)
+        config.delay_ms(1)
+        #noch unklar
+
+        #INPMUX (AINP = AIN4, AINN = AINCOM)
+        INPMUX = (0x04 << 4) | 0x0a
+        self.ADS1263_WriteReg(ADS1263_REG['REG_INPMUX'], INPMUX)
+        config.delay_ms(1)
+
+        # REFMUX Internal Reference, AVSS
+        REFMUX = (0x00 << 3) | 0x04
+        self.ADS1263_WriteReg(ADS1263_REG['REG_REFMUX'], REFMUX)
+        config.delay_ms(1)
+
+        #Read one conversion
+        self.ADS1263_WriteCmd(ADS1263_CMD['CMD_START1'])
+        config.delay_ms(10)
+        self.ADS1263_WaitDRDY()
+        Value = self.ADS1263_Read_ADC_Data()
+        self.ADS1263_WriteCmd(ADS1263_CMD['CMD_STOP1'])
+
+
+
     def ADS1263_DAC_Test(self, isPositive, isOpen):
         Volt = ADS1263_DAC_VOLT['ADS1263_DAC_VLOT_3']
         

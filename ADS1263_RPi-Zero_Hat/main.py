@@ -47,7 +47,8 @@ try:
             print("\33[3A")
 
         elif(TEST_SINGLE_RTD): # Test a single RTD on ADC2
-            ADC_Value = ADC.Get
+           # ADC_Value = ADC.ADS1263_GetChannelValue_ADC2(4)
+            ADC_Value = ADC.ADS1263_Single_RTD_Test()
 
 
 

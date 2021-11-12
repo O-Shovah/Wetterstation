@@ -6,7 +6,7 @@ import time
 import ADS1263
 import RPi.GPIO as GPIO
 
-REF = 5.08          # Modify according to actual voltage
+REF = 2.5          # Modify according to actual voltage
                     # external AVDD and AVSS(Default), or internal 2.5V
 TEST_ADC = 0        # ADC Test part
 TEST_RTD = 0        # RTD Test part
@@ -50,7 +50,7 @@ try:
             print("Did enter TEST_SINGLE_RTD case")
            # ADC_Value = ADC.ADS1263_GetChannelValue_ADC2(4)
             ADC_Value = ADC.ADS1263_Single_RTD_Test()
-            RES = ADC_Value #/ 2147483647.0 * 2.0 *2000.0       #2000.0 -- 2000R, 2.0 -- 2*i 
+            RES = ADC_Value / 2147483647.0 * 2.0 *2000.0       #2000.0 -- 2000R, 2.0 -- 2*i 
             print("RES is {}".format(RES))
             print("\33[3A")
 

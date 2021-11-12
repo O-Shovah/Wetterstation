@@ -47,12 +47,11 @@ try:
             print("\33[3A")
 
         elif(TEST_SINGLE_RTD): # Test a single RTD on ADC2
+            print("Did enter TEST_SINGLE_RTD case")
            # ADC_Value = ADC.ADS1263_GetChannelValue_ADC2(4)
             ADC_Value = ADC.ADS1263_Single_RTD_Test()
             RES = ADC_Value #/ 2147483647.0 * 2.0 *2000.0       #2000.0 -- 2000R, 2.0 -- 2*i 
-            print("RES is %lf"%RES)
-            #TEMP = (RES/100.0 - 1.0) / 0.00385      #0.00385 -- pt100
-            #print("TEMP is %lf"%TEMP)
+            print("RES is {}".format(RES))
             print("\33[3A")
 
 

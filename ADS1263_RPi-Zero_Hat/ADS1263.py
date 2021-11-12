@@ -522,6 +522,8 @@ class ADS1263:
         Value = self.ADS1263_Read_ADC_Data()
         self.ADS1263_WriteCmd(ADS1263_CMD['CMD_STOP1'])
 
+        return Value
+
 
 
     def ADS1263_DAC_Test(self, isPositive, isOpen):

@@ -8,9 +8,9 @@ import RPi.GPIO as GPIO
 
 REF = 5.08          # Modify according to actual voltage
                     # external AVDD and AVSS(Default), or internal 2.5V
-TEST_ADC = 1        # ADC Test part
+TEST_ADC = 0        # ADC Test part
 TEST_RTD = 0        # RTD Test part
-TEST_SINGLE_RTD = 0 # Test a single RTD on ADC2
+TEST_SINGLE_RTD = 1 # Test a single RTD on ADC2
 
 try:
     ADC = ADS1263.ADS1263()

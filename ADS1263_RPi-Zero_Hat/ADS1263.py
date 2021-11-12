@@ -439,7 +439,7 @@ class ADS1263:
         
     def ADS1263_RTD_Test(self):
         Delay = ADS1263_DELAY['ADS1263_DELAY_8d8ms']
-        Gain = ADS1263_GAIN['ADS1263_GAIN_1']
+        Gain = ADS1263_GAIN['ADS1263_GAIN_2']
         Drate = ADS1263_DRATE['ADS1263_20SPS']
         
         #MODE0 (CHOP OFF)

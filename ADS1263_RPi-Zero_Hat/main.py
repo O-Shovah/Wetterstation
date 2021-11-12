@@ -50,8 +50,8 @@ try:
             print("Did enter TEST_SINGLE_RTD case")
            # ADC_Value = ADC.ADS1263_GetChannelValue_ADC2(4)
             ADC_Value = ADC.ADS1263_Single_RTD_Test()
-            RES = ADC_Value #/ 4294967296 *        #2000.0 -- 2000R, 2.0 -- 2*i 
-            print("RES is {}".format(RES))
+            RES = ADC_Value / 4294967296 * 2,5 * 2        #2000.0 -- 2000R, 2.0 -- 2*i 
+            print("RES is {} V".format(RES))
             print("\33[3A")
 
 

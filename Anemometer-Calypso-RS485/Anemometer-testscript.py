@@ -140,11 +140,11 @@ def main():
   
     UserInterface()
 
-    SerialInterface()
-    SerialInterface.serial_port_setup()
+    Calypso_Serial = SerialInterface()
+    Calypso_Serial.serial_port_setup()
 
-    InfluxDBInterface()
-    InfluxDBInterface.influxdb_connection_setup()
+    Upload_Server = InfluxDBInterface()
+    Upload_Server.influxdb_connection_setup()
 
     KeyboardInputQueue = queue.Queue()
     SerialInputQueue = queue.Queue()
@@ -155,17 +155,13 @@ def main():
     # Main loop
     while (True):
 
-        # Read keyboard inputs
-        # Note: if this queue were being read in multiple places we would need to use the queueLock above to ensure
-        # multi-method-call atomic access. Since this is the only place we are removing from the queue, however, in this
-        # example program, no locks are required.
         if (KeyboardInputQueue.qsize() > 0):
             keyboard_input_str = KeyboardInputQueue.get()
             print("input_str = {}".format(keyboard_input_str))
 
             if (keyboard_input_str == EXIT_COMMAND):
                 print("Exiting serial terminal.")
-                SerialInterface.serial_interface_connection.close()
+                Calypso_Serial.serial_interface_connection.close()
                 break # exit the while loop
             
             # Insert your code here to do whatever you want with the input_str.

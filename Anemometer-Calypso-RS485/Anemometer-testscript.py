@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import logging
+
 import sys
 
 import time
@@ -10,86 +12,101 @@ import serial
 import threading
 import queue
 
-import logging
-
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS
 
-def keyboard_read_input(KeyboardInputQueue):
-    #print('Ready for keyboard input:')
-    while (True):
+class UserInterface():
+
+    def _init_(self)
+
+    def keyboard_read_input(KeyboardInputQueue):
+        #print('Ready for keyboard input: ')
+        while (True):
+            
+            keyboard_input_str = input()
+
+            KeyboardInputQueue.put(keyboard_input_str)
+
+
+def _init_(self, logLevel):
+    ## for file logging
+    numeric_level = getattr(logging, logLevel.upper(), 10)
+    if not isinstance(numeric_level, int):
+       raise ValueError('Invalid log level: %s' % logLevel)
+    logging.basicConfig(level=numeric_level)
+
+class SerialInterface():
+
+    def _init_(self):
+        self.serial_interface_connection = None
+
+    def serial_port_setup(self):
+
+        #set the parameters for the serial port
+        self.serial_interface_connection = serial.Serial(
+            port='COM4',\
+            baudrate=38400,\
+            parity=serial.PARITY_NONE,\
+            stopbits=serial.STOPBITS_ONE,\
+            bytesize=serial.EIGHTBITS,\
+            timeout=2)
+
+        print("connected to: " + serial_connection_set_up.portstr)
+
+        return(serial_connection_set_up)
+
+    def serial_read_input(self, SerialInputQueue):
         
-        keyboard_input_str = input()
+        #Example expected char string
+        #$IIMWV,066,R,000.5,M,A*25\r\n
 
-        KeyboardInputQueue.put(keyboard_input_str)
+        while (self.serial_interface_connection.isOpen()):
 
+            if (self.serial_interface_connection.inWaiting() > 0):
 
-def serial_read_input(SerialInputQueue):
+                timestamp_received_ns = time.time_ns()
+                print("timestamp_received_ns : " +str(timestamp_received_ns))
 
-    #Example expected char string
-    #$IIMWV,066,R,000.5,M,A*25\r\n
+                received_connection = serial_connection.inWaiting()
+                print("received_connection: " +str(received_connection))
 
-    while (serial_connection.isOpen()):
+                received_message = serial_connection.readline(27)
+                print("received message: " +str(received_message))
 
-        if (serial_connection.inWaiting() > 0):
+                received_connection = 0
 
-        timestamp_received_ns = time.time_ns()
-        print("timestamp_received_ns : " +str(timestamp_received_ns))
+                decoded_message=received_message.decode('ascii')
+                print("decoded message: " + decoded_message[0:25])
 
-        received_connection = serial_connection.inWaiting()
-        print("received_connection: " +str(received_connection))
+                windspeed_message = decoded_message[13:17]
+                print("Windspeed message: " + windspeed_message)
 
-        received_message = serial_connection.readline(27)
-        print("received message: " +str(received_message))
+                windspeed=float(windspeed_message)
+                print("Windspeed [m/s]: " +str (windspeed))
 
-        received_connection = 0
+                winddirection_message = decoded_message[7:10]
+                print("Winddirection message : " + winddirection_message)
 
-        decoded_message=received_message.decode('ascii')
-        print("decoded message: " + decoded_message[0:25])
-
-        windspeed_message = decoded_message[13:17]
-        print("Windspeed message: " + windspeed_message)
-
-        windspeed=float(windspeed_message)
-        print("Windspeed [m/s]: " +str (windspeed))
-
-        winddirection_message = decoded_message[7:10]
-        print("Winddirection message : " + winddirection_message)
-
-        winddirection=int(winddirection_message)
-        print("Winddirection [deg] : " +str (winddirection))
-
-        point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
-
-        result=write_api.write(bucket, org, point)
-
-        print("Result : " +str(result))
-        print("**************************\n\n\n**************************")
-        
-        time.sleep(0.01)
+                winddirection=int(winddirection_message)
+                print("Winddirection [deg] : " +str (winddirection))
 
 
-def InfluxDB_upload(SerialInputQueue):
+                print("Result : " +str(result))
+                print("**************************\n\n\n**************************")
+            
+            time.sleep(0.01)
+
+
+def InfluxDB_upload(SerialInputQueue, winddirection, windspeed, timestamp_received_ns, bucket, org):
 
     #The fuction to be threaded for uploading the received values into the influxDB from the Queue
 
+    point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
 
+    result=write_api.write(bucket, org, point)
 
+    return()
 
-def serial_port_setup():
-
-     #set the parameters for the serial port
-    serial_connection_set_up = serial.Serial(
-        port='COM4',\
-        baudrate=38400,\
-        parity=serial.PARITY_NONE,\
-        stopbits=serial.STOPBITS_ONE,\
-        bytesize=serial.EIGHTBITS,\
-        timeout=2)
-
-    print("connected to: " + serial_connection.portstr)
-
-    return(serial_connection_set_up)
 
 def influxdb_connection_setup():
 
@@ -109,14 +126,10 @@ def main():
 
     EXIT_COMMAND = "exit" # Command to exit this program
 
-    numeric_level = getattr(logging, loglevel.upper(), None)
-    if not isinstance(numeric_level, int):
-       raise ValueError('Invalid log level: %s' % loglevel)
-    logging.basicConfig(level=numeric_level, ...)
+    SerialInterface()
+    SerialInterface.serial_port_setup()
 
-
-
-
+    influxdb_connection_setup()
 
     KeyboardInputQueue = queue.Queue()
 
@@ -134,7 +147,7 @@ def main():
             keyboard_input_str = KeyboardInputQueue.get()
             print("input_str = {}".format(input_str))
 
-            if (input_str == EXIT_COMMAND):
+            if (keyboard_input_str == EXIT_COMMAND):
                 print("Exiting serial terminal.")
                 serial_connection_set_up.close()
                 break # exit the while loop

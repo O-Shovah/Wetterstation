@@ -15,6 +15,15 @@ import queue
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS
 
+
+def _init_(self, logLevel):
+        ## for file logging
+        numeric_level = getattr(logging, logLevel.upper(), 10)
+        if not isinstance(numeric_level, int):
+            raise ValueError('Invalid log level: %s' % logLevel)
+        logging.basicConfig(level=numeric_level)
+
+
 class UserInterface():
 
     def _init_(self):
@@ -27,13 +36,6 @@ class UserInterface():
             self.keyboard_input_str = input()
 
             KeyboardInputQueue.put(self.keyboard_input_str)
-
-    def _init_(self, logLevel):
-        ## for file logging
-        numeric_level = getattr(logging, logLevel.upper(), 10)
-        if not isinstance(numeric_level, int):
-            raise ValueError('Invalid log level: %s' % logLevel)
-        logging.basicConfig(level=numeric_level)
 
 
 class SerialInterface():
@@ -52,9 +54,9 @@ class SerialInterface():
             bytesize = serial.EIGHTBITS,\
             timeout = 2)
 
-        print("connected to: " + serial_connection_set_up.portstr)
+        print("connected to: " + self.serial_interface_connection.portstr)
 
-        return(serial_connection_set_up)
+        return()
 
     def serial_read_input(self, SerialInputQueue):
         
@@ -66,34 +68,32 @@ class SerialInterface():
             if (self.serial_interface_connection.inWaiting() > 0):
 
                 timestamp_received_ns = time.time_ns()
-                print("timestamp_received_ns : " +str(timestamp_received_ns))
+                logging.debug("timestamp_received_ns : " +str(timestamp_received_ns))
 
-                received_connection = serial_connection.inWaiting()
-                print("received_connection: " +str(received_connection))
+                received_connection = self.serial_interface_connection.inWaiting()
+                logging.debug("received_connection: " +str(received_connection))
 
-                received_message = serial_connection.readline(27)
-                print("received message: " +str(received_message))
+                received_message = self.serial_interface_connection.readline(27)
+                logging.debug("received message: " +str(received_message))
 
                 received_connection = 0
 
                 decoded_message=received_message.decode('ascii')
-                print("decoded message: " + decoded_message[0:25])
+                logging.debug("decoded message: " + decoded_message[0:25])
 
                 windspeed_message = decoded_message[13:17]
-                print("Windspeed message: " + windspeed_message)
+                logging.debug("Windspeed message: " + windspeed_message)
 
                 windspeed=float(windspeed_message)
-                print("Windspeed [m/s]: " +str (windspeed))
+                logging.debug("Windspeed [m/s]: " +str (windspeed))
 
                 winddirection_message = decoded_message[7:10]
-                print("Winddirection message : " + winddirection_message)
+                logging.debug("Winddirection message : " + winddirection_message)
 
                 winddirection=int(winddirection_message)
-                print("Winddirection [deg] : " +str (winddirection))
+                logging.debug("Winddirection [deg] : " +str (winddirection))
 
-
-                print("Result : " +str(result))
-                print("**************************\n\n\n**************************")
+                logging.debug("**************************\n\n\n**************************")
             
             time.sleep(0.01)
 
@@ -128,6 +128,8 @@ class InfluxDBInterface():
 
         result = self.write_api.write(self.bucket, self.org, point)
 
+        logging.debug("Result : " +str(result))
+
         return(result)
 
 
@@ -135,14 +137,19 @@ def main():
 
     EXIT_COMMAND = "exit" # Command to exit this program
 
+  
+    UserInterface()
+
     SerialInterface()
     SerialInterface.serial_port_setup()
 
-    influxdb_connection_setup()
+    InfluxDBInterface()
+    InfluxDBInterface.influxdb_connection_setup()
 
     KeyboardInputQueue = queue.Queue()
+    SerialInputQueue = queue.Queue()
 
-    KeyboardInputThread = threading.Thread(target= keyboard_read_input, args=(KeyboardInputQueue,), daemon=True)
+    KeyboardInputThread = threading.Thread(target= UserInterface.keyboard_read_input, args=(KeyboardInputQueue,), daemon=True)
     KeyboardInputThread.start()
 
     # Main loop
@@ -154,11 +161,11 @@ def main():
         # example program, no locks are required.
         if (KeyboardInputQueue.qsize() > 0):
             keyboard_input_str = KeyboardInputQueue.get()
-            print("input_str = {}".format(input_str))
+            print("input_str = {}".format(keyboard_input_str))
 
             if (keyboard_input_str == EXIT_COMMAND):
                 print("Exiting serial terminal.")
-                serial_connection_set_up.close()
+                SerialInterface.serial_interface_connection.close()
                 break # exit the while loop
             
             # Insert your code here to do whatever you want with the input_str.

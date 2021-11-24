@@ -1,5 +1,7 @@
+
 from datetime import datetime
 import sys
+import time
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS
@@ -24,32 +26,46 @@ serial_connection = serial.Serial(
 print("connected to: " + serial_connection.portstr)
 
 #Example expected char string
-#$IIMWV,066,R,000.5,M,A*25
+#$IIMWV,066,R,000.5,M,A*25\r\n
 
-while True:
- received_message=serial_connection.readline(27)
- print("received message: " +str(received_message))
- # if received_message != " ":
- decoded_message=received_message.decode('ascii')
- print("decoded message: " + decoded_message)
- 
- windspeed_message = decoded_message[13:18]
- print("Windspeed message: " + windspeed_message)
- 
- windspeed=float(windspeed_message)
- print("Windspeed : " +str (windspeed)) 
- 
- winddirection_message = decoded_message[8:10]
- print("Winddirection message : " + winddirection_message)
-  
- winddirection=int(winddirection_message)
- print("Winddirection : " +str (winddirection))
- 
- point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection", winddirection).field("Windspeed", windspeed).time(datetime.utcnow(), WritePrecision.NS)
+while (serial_connection.isOpen()):
 
- result=write_api.write(bucket, org, point)
+ if (serial_connection.inWaiting() > 0):
 
- print("Result : " +str(result)) 
+  timestamp_received_ns = time.time_ns()
+  print("timestamp_received_ns : " +str(timestamp_received_ns))
+
+  received_connection = serial_connection.inWaiting()
+  print("received_connection: " +str(received_connection))
+
+  received_message = serial_connection.readline(27)
+  print("received message: " +str(received_message))
+
+  received_connection = 0
+
+  decoded_message=received_message.decode('ascii')
+  print("decoded message: " + decoded_message[0:25])
+
+  windspeed_message = decoded_message[13:17]
+  print("Windspeed message: " + windspeed_message)
+
+  windspeed=float(windspeed_message)
+  print("Windspeed [m/s]: " +str (windspeed))
+
+  winddirection_message = decoded_message[7:10]
+  print("Winddirection message : " + winddirection_message)
+
+  winddirection=int(winddirection_message)
+  print("Winddirection [deg] : " +str (winddirection))
+
+  point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
+
+  result=write_api.write(bucket, org, point)
+
+  print("Result : " +str(result))
+  print("**************************\n\n\n**************************")
+
+  time.sleep(0.4)
 
 serial_connection.close()
 

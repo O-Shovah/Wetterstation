@@ -73,8 +73,6 @@ class SerialInterface():
 
             if (self.serial_interface_connection.inWaiting() >25):
 
-                decoded_message = 0
-
                 timestamp_received_ns = time.time_ns()
                 logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
 
@@ -96,21 +94,21 @@ class SerialInterface():
 
                     received_message = None
 
-                windspeed_message = decoded_message[13:17]
-                logging.warning("Windspeed message: " + windspeed_message)
+                    windspeed_message = decoded_message[13:17]
+                    logging.warning("Windspeed message: " + windspeed_message)
 
-                windspeed=float(windspeed_message)
-                logging.warning("Windspeed [m/s]: " +str (windspeed))
+                    windspeed=float(windspeed_message)
+                    logging.warning("Windspeed [m/s]: " +str (windspeed))
 
-                winddirection_message = decoded_message[7:10]
-                logging.warning("Winddirection message : " + winddirection_message)
+                    winddirection_message = decoded_message[7:10]
+                    logging.warning("Winddirection message : " + winddirection_message)
 
-                winddirection=int(winddirection_message)
-                logging.warning("Winddirection [deg] : " +str (winddirection))
+                    winddirection=int(winddirection_message)
+                    logging.warning("Winddirection [deg] : " +str (winddirection))
 
-                logging.warning("**************************")
+                    logging.warning("**************************")
 
-                SerialInputQueue.put((winddirection, windspeed, timestamp_received_ns))
+                    SerialInputQueue.put((winddirection, windspeed, timestamp_received_ns))
             
                 #if (SerialInputQueue.qsize() > 0):
                 #    winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()

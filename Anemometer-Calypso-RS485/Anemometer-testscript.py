@@ -49,8 +49,8 @@ class SerialInterface():
 
         #set the parameters for the serial port
         self.serial_interface_connection = serial.Serial(
-            port = 'COM4',\
-            #port = '/dev/ttyAMA0',\
+            #port = 'COM4',\
+            port = '/dev/ttyUSB0',\
             baudrate = 38400,\
             parity = serial.PARITY_NONE,\
             stopbits = serial.STOPBITS_ONE,\
@@ -68,16 +68,16 @@ class SerialInterface():
 
         while (self.serial_interface_connection.isOpen()):
 
-            if (self.serial_interface_connection.inWaiting() > 25):
+            if (self.serial_interface_connection.inWaiting() > 0):
 
                 timestamp_received_ns = time.time_ns()
-               # logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
+                logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
 
                 received_connection = self.serial_interface_connection.inWaiting()
                 logging.warning("received_connection: " +str(received_connection))
 
                 received_message = self.serial_interface_connection.readline(26)
-              #  logging.warning("received message: " +str(received_message))
+                logging.warning("received message: " +str(received_message))
 
                 received_connection = self.serial_interface_connection.inWaiting()
                 logging.warning("received_connection-2: " +str(received_connection))
@@ -85,21 +85,21 @@ class SerialInterface():
                 received_connection = 0
 
                 decoded_message=received_message.decode('ascii')
-              #  logging.warning("decoded message: " + decoded_message[0:25])
+                logging.warning("decoded message: " + decoded_message[0:25])
 
                 windspeed_message = decoded_message[13:17]
-             #   logging.warning("Windspeed message: " + windspeed_message)
+                logging.warning("Windspeed message: " + windspeed_message)
 
                 windspeed=float(windspeed_message)
-              #  logging.warning("Windspeed [m/s]: " +str (windspeed))
+                logging.warning("Windspeed [m/s]: " +str (windspeed))
 
                 winddirection_message = decoded_message[7:10]
-              #  logging.warning("Winddirection message : " + winddirection_message)
+                logging.warning("Winddirection message : " + winddirection_message)
 
                 winddirection=int(winddirection_message)
-              #  logging.warning("Winddirection [deg] : " +str (winddirection))
+                logging.warning("Winddirection [deg] : " +str (winddirection))
 
-               # logging.warning("**************************\n\n\n**************************")
+                logging.warning("**************************")
 
                 SerialInputQueue.put((winddirection, windspeed, timestamp_received_ns))
             

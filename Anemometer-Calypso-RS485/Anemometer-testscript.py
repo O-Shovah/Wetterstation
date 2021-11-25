@@ -76,10 +76,10 @@ class SerialInterface():
                 received_connection = self.serial_interface_connection.inWaiting()
                 logging.warning("received_connection: " +str(received_connection))
 
-                received_message = self.serial_interface_connection.readline(27)
+                received_message = self.serial_interface_connection.readline(26)
                 logging.warning("received message: " +str(received_message))
 
-                if (received_message > 25):
+                if (len(received_message) > 25):
 
                     received_connection = self.serial_interface_connection.inWaiting()
                     logging.warning("received_connection-2: " +str(received_connection))

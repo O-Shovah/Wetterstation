@@ -205,11 +205,11 @@ def main():
     logging.warning("Threads started")
 
         # Main loop
-        while (True):
+    while (True):
 
-            if (KeyboardInputQueue.qsize() > 0):
-                keyboard_input_str = KeyboardInputQueue.get()
-                print("input_str = {}".format(keyboard_input_str))
+        if (KeyboardInputQueue.qsize() > 0):
+            keyboard_input_str = KeyboardInputQueue.get()
+            print("input_str = {}".format(keyboard_input_str))
 
                 if (keyboard_input_str == EXIT_COMMAND):
                     print("Exiting serial terminal.")

@@ -149,7 +149,7 @@ class InfluxDBInterface():
 
                 timestamp_received_s = timestamp_received_ns/1000000
 
-                print("Timestamp s: ", +str(timestamp_received_s)
+                print("Timestamp s: ", +str(timestamp_received_s))
 
                 local_time_human = time.strftime('%Y-%m-%d %H:%M:%S:%F', time.localtime(timestamp_received_s))
 

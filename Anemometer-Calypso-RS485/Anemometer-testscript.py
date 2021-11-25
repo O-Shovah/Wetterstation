@@ -50,6 +50,7 @@ class SerialInterface():
         #set the parameters for the serial port
         self.serial_interface_connection = serial.Serial(
             port = 'COM4',\
+            port = '/dev/ttyAMA0',\
             baudrate = 38400,\
             parity = serial.PARITY_NONE,\
             stopbits = serial.STOPBITS_ONE,\
@@ -147,21 +148,21 @@ class InfluxDBInterface():
 
                 winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
-                timestamp_received_s = timestamp_received_ns/1000000
+                timestamp_received_s = int(timestamp_received_ns/1000000000)
 
-                print("Timestamp s: ", +str(timestamp_received_s))
+                #print("Timestamp s: " +str(timestamp_received_s))
 
-                local_time_human = time.strftime('%Y-%m-%d %H:%M:%S:%F', time.localtime(timestamp_received_s))
+                local_time_human = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(timestamp_received_s))
 
                 logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} \n Lokale Zeit: {} ".format(winddirection, windspeed, timestamp_received_ns, local_time_human))
            
-                point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
+                point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns).field("Reading_received_timestamp_[UTC]", local_time_human)
 
                 result = self.write_api.write(self.bucket, self.org, point)
 
                 logging.info("Result : " +str(result))
 
-        time.sleep(0.01)
+            time.sleep(0.01)
 
         
 
@@ -203,28 +204,28 @@ def main():
 
     logging.warning("Threads started")
 
-    # Main loop
-    while (True):
+        # Main loop
+        while (True):
 
-        if (KeyboardInputQueue.qsize() > 0):
-            keyboard_input_str = KeyboardInputQueue.get()
-            print("input_str = {}".format(keyboard_input_str))
+            if (KeyboardInputQueue.qsize() > 0):
+                keyboard_input_str = KeyboardInputQueue.get()
+                print("input_str = {}".format(keyboard_input_str))
 
-            if (keyboard_input_str == EXIT_COMMAND):
-                print("Exiting serial terminal.")
-                Calypso_Serial.serial_interface_connection.close()
-                print("Serial Interfacce queue" +str(SerialInputQueue.qsize()))
-                while (SerialInputQueue.qsize() > 0):
-                    time.sleep(0.1)
-                    if (SerialInputQueue.qsize() == 0):
-                        #KeyboardInputThread.stop()
-                        #Calypso_Serial.stop()
-                        #InfluxDBOutputThread.stop()
+                if (keyboard_input_str == EXIT_COMMAND):
+                    print("Exiting serial terminal.")
+                    Calypso_Serial.serial_interface_connection.close()
+                    print("Serial Interfacce queue" +str(SerialInputQueue.qsize()))
+                    while (SerialInputQueue.qsize() > 0):
+                        time.sleep(0.1)
+                        if (SerialInputQueue.qsize() == 0):
+                            #KeyboardInputThread.stop()
+                            #Calypso_Serial.stop()
+                            #InfluxDBOutputThread.stop()
 
-                        break # exit the while loop
-            
-        # Sleep for a short time to prevent this thread from sucking up all of your CPU resources on your PC.
-        time.sleep(0.01) 
+                            break # exit the while loop
+                
+            # Sleep for a short time to prevent this thread from sucking up all of your CPU resources on your PC.
+            time.sleep(0.01) 
     
     print("End.")
 

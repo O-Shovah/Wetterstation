@@ -204,7 +204,7 @@ def main():
 
     logging.warning("Threads started")
 
-        # Main loop
+    # Main loop
     while (True):
 
         if (KeyboardInputQueue.qsize() > 0):
@@ -229,6 +229,6 @@ def main():
     
     print("End.")
 
-    # If you run this Python file directly (ex: via `python3 this_filename.py`), do the following:
-    if (__name__ == '__main__'): 
-        main()
+# If you run this Python file directly (ex: via `python3 this_filename.py`), do the following:
+if (__name__ == '__main__'): 
+    main()

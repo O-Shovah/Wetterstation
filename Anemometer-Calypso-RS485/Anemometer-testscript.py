@@ -68,7 +68,7 @@ class SerialInterface():
 
         while (self.serial_interface_connection.isOpen()):
 
-            if (self.serial_interface_connection.inWaiting() > 0):
+            if (self.serial_interface_connection.inWaiting() >25):
 
                 timestamp_received_ns = time.time_ns()
                 logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
@@ -76,7 +76,7 @@ class SerialInterface():
                 received_connection = self.serial_interface_connection.inWaiting()
                 logging.warning("received_connection: " +str(received_connection))
 
-                received_message = self.serial_interface_connection.readline(26)
+                received_message = self.serial_interface_connection.readline(27)
                 logging.warning("received message: " +str(received_message))
 
                 received_connection = self.serial_interface_connection.inWaiting()

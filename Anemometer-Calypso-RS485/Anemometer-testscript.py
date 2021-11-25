@@ -16,12 +16,14 @@ from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS
 
 
-def _init_(self, logLevel):
+class LoggingSystem:
+    def _init_(self, loglevel):
+        logging.warning('raised an error')
         ## for file logging
-        numeric_level = getattr(logging, logLevel.upper(), 10)
+        numeric_level = getattr(logging, loglevel.upper(), 10)
         if not isinstance(numeric_level, int):
-            raise ValueError('Invalid log level: %s' % logLevel)
-        logging.basicConfig(level=numeric_level)
+            raise ValueError('Invalid log level: %s' % loglevel)
+        logging.basicConfig(level=numeric_level,)
 
 
 class UserInterface():
@@ -68,33 +70,40 @@ class SerialInterface():
             if (self.serial_interface_connection.inWaiting() > 0):
 
                 timestamp_received_ns = time.time_ns()
-                logging.debug("timestamp_received_ns : " +str(timestamp_received_ns))
+               # logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
 
                 received_connection = self.serial_interface_connection.inWaiting()
-                logging.debug("received_connection: " +str(received_connection))
+               # logging.warning("received_connection: " +str(received_connection))
 
                 received_message = self.serial_interface_connection.readline(27)
-                logging.debug("received message: " +str(received_message))
+              #  logging.warning("received message: " +str(received_message))
 
                 received_connection = 0
 
                 decoded_message=received_message.decode('ascii')
-                logging.debug("decoded message: " + decoded_message[0:25])
+              #  logging.warning("decoded message: " + decoded_message[0:25])
 
                 windspeed_message = decoded_message[13:17]
-                logging.debug("Windspeed message: " + windspeed_message)
+             #   logging.warning("Windspeed message: " + windspeed_message)
 
                 windspeed=float(windspeed_message)
-                logging.debug("Windspeed [m/s]: " +str (windspeed))
+              #  logging.warning("Windspeed [m/s]: " +str (windspeed))
 
                 winddirection_message = decoded_message[7:10]
-                logging.debug("Winddirection message : " + winddirection_message)
+              #  logging.warning("Winddirection message : " + winddirection_message)
 
                 winddirection=int(winddirection_message)
-                logging.debug("Winddirection [deg] : " +str (winddirection))
+              #  logging.warning("Winddirection [deg] : " +str (winddirection))
 
-                logging.debug("**************************\n\n\n**************************")
+               # logging.warning("**************************\n\n\n**************************")
+
+                SerialInputQueue.put((winddirection, windspeed, timestamp_received_ns))
             
+                #if (SerialInputQueue.qsize() > 0):
+                #    winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
+                #    print("Winddirection: " +str (windspeed))
+                #Did Check. And Values are actually written into the Queue
+
             time.sleep(0.01)
 
 
@@ -114,43 +123,78 @@ class InfluxDBInterface():
 
         client = InfluxDBClient(url = "http://192.168.2.3:8086", token = self.token)
 
-        write_api = client.write_api(write_options = ASYNCHRONOUS)
+        self.write_api = client.write_api(write_options = ASYNCHRONOUS)
+
+        logging.warning("Write API : " +str(self.write_api))
 
         return()
 
 
 
-    def InfluxDB_upload(self, SerialInputQueue, winddirection, windspeed, timestamp_received_ns):
+    def InfluxDB_upload(self, SerialInputQueue):
 
         #The fuction to be threaded for uploading the received values into the influxDB from the Queue
+        
+        while(True):
+            logging.debug("Loop Upload")
+            result = None
 
-        point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
+            if (SerialInputQueue.qsize() > 0):
+                logging.warning("Start Upload")
 
-        result = self.write_api.write(self.bucket, self.org, point)
+                winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
-        logging.debug("Result : " +str(result))
+                logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} ".format(winddirection, windspeed, timestamp_received_ns))
+           
+                winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
-        return(result)
+                point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
 
+                result = self.write_api.write(self.bucket, self.org, point)
+
+                logging.info("Result : " +str(result))
+
+        time.sleep(0.01)
+
+        
 
 def main():
 
     EXIT_COMMAND = "exit" # Command to exit this program
 
-  
-    UserInterface()
+    Logging_Init = LoggingSystem()
+
+    logging.warning('Logging Initiated')
+
+    Keyboard_Input = UserInterface()
+
+    logging.warning("User Interface loaded")
 
     Calypso_Serial = SerialInterface()
     Calypso_Serial.serial_port_setup()
 
+    logging.warning("Serial Port set up")
+
     Upload_Server = InfluxDBInterface()
     Upload_Server.influxdb_connection_setup()
+
+    logging.warning("InfluxDB connection set up")
 
     KeyboardInputQueue = queue.Queue()
     SerialInputQueue = queue.Queue()
 
-    KeyboardInputThread = threading.Thread(target= UserInterface.keyboard_read_input, args=(KeyboardInputQueue,), daemon=True)
+    logging.warning("Queues set up")
+
+    KeyboardInputThread = threading.Thread(target= Keyboard_Input.keyboard_read_input, args=(KeyboardInputQueue,), daemon=True)
     KeyboardInputThread.start()
+
+    SerialInputThread = threading.Thread(target= Calypso_Serial.serial_read_input, args=(SerialInputQueue,), daemon=True)
+    SerialInputThread.start()
+
+    InfluxDBOutputThread = threading.Thread(target= Upload_Server.InfluxDB_upload, args=(SerialInputQueue,), daemon=True)
+    InfluxDBOutputThread.start()
+
+    logging.warning("Threads started")
 
     # Main loop
     while (True):
@@ -162,12 +206,16 @@ def main():
             if (keyboard_input_str == EXIT_COMMAND):
                 print("Exiting serial terminal.")
                 Calypso_Serial.serial_interface_connection.close()
+
+                while (SerialInputQueue.qsize() > 0):
+                    time.sleep(0.1)
+
+                #KeyboardInputThread.stop()
+                #Calypso_Serial.stop()
+                #InfluxDBOutputThread.stop()
+
                 break # exit the while loop
             
-            # Insert your code here to do whatever you want with the input_str.
-
-        # The rest of your program goes here.
-
         # Sleep for a short time to prevent this thread from sucking up all of your CPU resources on your PC.
         time.sleep(0.01) 
     

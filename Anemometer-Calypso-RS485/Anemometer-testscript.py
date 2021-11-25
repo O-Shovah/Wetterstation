@@ -146,7 +146,11 @@ class InfluxDBInterface():
             if (SerialInputQueue.qsize() > 0):
                 logging.warning("Start Upload")
 
+                logging.warning("Queue Size initially: " +str(SerialInputQueue.qsize()))
+
                 winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
+
+                logging.warning("Queue Size post: " +str(SerialInputQueue.qsize()))
 
                 timestamp_received_s = int(timestamp_received_ns/1000000000)
 

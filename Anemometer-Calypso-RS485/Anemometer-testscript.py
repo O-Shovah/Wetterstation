@@ -144,10 +144,12 @@ class InfluxDBInterface():
 
                 winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
-                logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} ".format(winddirection, windspeed, timestamp_received_ns))
+                logging.warning("Winddirection1: {} Windspeed1: {} Epoch-Timestamp1: {} ".format(winddirection, windspeed, timestamp_received_ns))
            
                 winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
+                logging.warning("Winddirection2: {} Windspeed2: {} Epoch-Timestamp2: {} ".format(winddirection, windspeed, timestamp_received_ns))
+           
                 point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
 
                 result = self.write_api.write(self.bucket, self.org, point)

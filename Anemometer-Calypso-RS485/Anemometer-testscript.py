@@ -67,16 +67,19 @@ class SerialInterface():
 
         while (self.serial_interface_connection.isOpen()):
 
-            if (self.serial_interface_connection.inWaiting() > 0):
+            if (self.serial_interface_connection.inWaiting() > 25):
 
                 timestamp_received_ns = time.time_ns()
                # logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))
 
                 received_connection = self.serial_interface_connection.inWaiting()
-               # logging.warning("received_connection: " +str(received_connection))
+                logging.warning("received_connection: " +str(received_connection))
 
-                received_message = self.serial_interface_connection.readline(27)
+                received_message = self.serial_interface_connection.readline(26)
               #  logging.warning("received message: " +str(received_message))
+
+                received_connection = self.serial_interface_connection.inWaiting()
+                logging.warning("received_connection-2: " +str(received_connection))
 
                 received_connection = 0
 
@@ -144,10 +147,14 @@ class InfluxDBInterface():
 
                 winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
 
-                logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} ".format(winddirection, windspeed, timestamp_received_ns))
-           
-                winddirection, windspeed, timestamp_received_ns = SerialInputQueue.get()
+                timestamp_received_s = timestamp_received_ns/1000000
 
+                print("Timestamp s: ", +str(timestamp_received_s)
+
+                local_time_human = time.strftime('%Y-%m-%d %H:%M:%S:%F', time.localtime(timestamp_received_s))
+
+                logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} \n Lokale Zeit: {} ".format(winddirection, windspeed, timestamp_received_ns, local_time_human))
+           
                 point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns)
 
                 result = self.write_api.write(self.bucket, self.org, point)
@@ -206,15 +213,15 @@ def main():
             if (keyboard_input_str == EXIT_COMMAND):
                 print("Exiting serial terminal.")
                 Calypso_Serial.serial_interface_connection.close()
-
+                print("Serial Interfacce queue" +str(SerialInputQueue.qsize()))
                 while (SerialInputQueue.qsize() > 0):
                     time.sleep(0.1)
+                    if (SerialInputQueue.qsize() == 0):
+                        #KeyboardInputThread.stop()
+                        #Calypso_Serial.stop()
+                        #InfluxDBOutputThread.stop()
 
-                #KeyboardInputThread.stop()
-                #Calypso_Serial.stop()
-                #InfluxDBOutputThread.stop()
-
-                break # exit the while loop
+                        break # exit the while loop
             
         # Sleep for a short time to prevent this thread from sucking up all of your CPU resources on your PC.
         time.sleep(0.01) 

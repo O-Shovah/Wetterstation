@@ -211,21 +211,21 @@ def main():
             keyboard_input_str = KeyboardInputQueue.get()
             print("input_str = {}".format(keyboard_input_str))
 
-                if (keyboard_input_str == EXIT_COMMAND):
-                    print("Exiting serial terminal.")
-                    Calypso_Serial.serial_interface_connection.close()
-                    print("Serial Interfacce queue" +str(SerialInputQueue.qsize()))
-                    while (SerialInputQueue.qsize() > 0):
-                        time.sleep(0.1)
-                        if (SerialInputQueue.qsize() == 0):
-                            #KeyboardInputThread.stop()
-                            #Calypso_Serial.stop()
-                            #InfluxDBOutputThread.stop()
+            if (keyboard_input_str == EXIT_COMMAND):
+                print("Exiting serial terminal.")
+                Calypso_Serial.serial_interface_connection.close()
+                print("Serial Interfacce queue" +str(SerialInputQueue.qsize()))
+                while (SerialInputQueue.qsize() > 0):
+                    time.sleep(0.1)
+                    if (SerialInputQueue.qsize() == 0):
+                        #KeyboardInputThread.stop()
+                         #Calypso_Serial.stop()
+                        #InfluxDBOutputThread.stop()
 
-                            break # exit the while loop
+                        break # exit the while loop
                 
             # Sleep for a short time to prevent this thread from sucking up all of your CPU resources on your PC.
-            time.sleep(0.01) 
+        time.sleep(0.01) 
     
     print("End.")
 

@@ -162,7 +162,12 @@ class InfluxDBInterface():
            
                 point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns).field("Reading_received_timestamp_[UTC]", local_time_human)
 
+
+                upload_start_ns = time.time_ns()
                 result = self.write_api.write(self.bucket, self.org, point)
+                upload_finish_ns = time.time_ns()
+
+                logging.warning("timedelta Upload: " +str(upload_finish_ns - upload_start_ns))
 
                 logging.info("Result : " +str(result))
 

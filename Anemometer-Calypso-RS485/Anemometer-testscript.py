@@ -66,6 +66,9 @@ class SerialInterface():
         #Example expected char string
         #$IIMWV,066,R,000.5,M,A*25\r\n
 
+        decoded_message, windspeed_message, winddirection_message,\
+         timestamp_received_ns, received_connection, received_message = None
+
         while (self.serial_interface_connection.isOpen()):
 
             if (self.serial_interface_connection.inWaiting() >25):

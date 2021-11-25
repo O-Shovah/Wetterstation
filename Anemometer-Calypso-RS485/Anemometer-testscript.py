@@ -73,7 +73,7 @@ class SerialInterface():
 
             if (self.serial_interface_connection.inWaiting() >25):
 
-                decoded_message = None
+                decoded_message = 0
 
                 timestamp_received_ns = time.time_ns()
                 logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))

@@ -79,13 +79,17 @@ class SerialInterface():
                 received_message = self.serial_interface_connection.readline(27)
                 logging.warning("received message: " +str(received_message))
 
-                received_connection = self.serial_interface_connection.inWaiting()
-                logging.warning("received_connection-2: " +str(received_connection))
+                if (received_message > 25)
 
-                received_connection = 0
+                    received_connection = self.serial_interface_connection.inWaiting()
+                    logging.warning("received_connection-2: " +str(received_connection))
 
-                decoded_message=received_message.decode('ascii')
-                logging.warning("decoded message: " + decoded_message[0:25])
+                    received_connection = 0
+
+                    decoded_message=received_message.decode('ascii')
+                    logging.warning("decoded message: " + decoded_message[0:25])
+
+                    received_message = None
 
                 windspeed_message = decoded_message[13:17]
                 logging.warning("Windspeed message: " + windspeed_message)

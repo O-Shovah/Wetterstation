@@ -66,12 +66,14 @@ class SerialInterface():
         #Example expected char string
         #$IIMWV,066,R,000.5,M,A*25\r\n
 
-        decoded_message = None
+        
         #windspeed_message, winddirection_message, timestamp_received_ns, received_connection, received_message = 0
 
         while (self.serial_interface_connection.isOpen()):
 
             if (self.serial_interface_connection.inWaiting() >25):
+
+                decoded_message = None
 
                 timestamp_received_ns = time.time_ns()
                 logging.warning("timestamp_received_ns : " +str(timestamp_received_ns))

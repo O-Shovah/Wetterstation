@@ -167,8 +167,9 @@ class InfluxDBInterface():
 
                 logging.warning("Winddirection: {} Windspeed: {} Epoch-Timestamp: {} \n Lokale Zeit: {} ".format(winddirection, windspeed, timestamp_received_ns, local_time_human))
            
-                point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns).field("Reading_received_timestamp_[UTC]", local_time_human)
+                #point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns).field("Reading_received_timestamp_[UTC]", local_time_human)
 
+                point = "Testrun,Sensor=Anemometer Windspeed_[m/s]=23.43234543"
 
                 upload_start_ns = time.time_ns()
                 result = self.write_api.write(self.bucket, self.org, point)

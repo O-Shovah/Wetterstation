@@ -169,7 +169,7 @@ class InfluxDBInterface():
            
                 #point = Point("Testrun").tag("Sensor", "Anemometer").field("Winddirection_[deg]", winddirection).field("Windspeed_[m/s]", windspeed).field("Reading_received_timestamp_[ns]", timestamp_received_ns).field("Reading_received_timestamp_[UTC]", local_time_human)
 
-                point = "Testrun,Sensor=Anemometer Windspeed_[m/s]=23.43234543"
+                point = "Testrun,Sensor=Anemometer Windspeed_[m/s]={}", windspeed
 
                 upload_start_ns = time.time_ns()
                 result = self.write_api.write(self.bucket, self.org, point)
